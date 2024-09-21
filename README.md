@@ -1,0 +1,8 @@
+config.json:
+
+```
+{
+    "mongoURL": "...",
+    "JWTsecret": "..."
+}
+```
