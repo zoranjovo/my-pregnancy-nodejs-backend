@@ -13,6 +13,8 @@ const newConsultationRequest = require('./functions/consultation/newConsultation
 const getExistingConsultationRequests = require('./functions/consultation/getExistingConsultationRequests.js');
 const updateConsultationState = require('./functions/consultation/updateConsultationState.js');
 
+const PORT = 8000;
+
 //mongo
 const {MongoClient} = require('mongodb');
 const mclient = new MongoClient(config.mongoURL);
@@ -50,7 +52,7 @@ app.use((err, req, res, next) => {
 });
 
 app.use(cors())
-app.listen(8000, () => { console.log(`express server active`); });
+app.listen(PORT, () => { console.log(`express server active, http://localhost:${PORT}`); });
 
 app.get('//test', async (req, res) => { res.sendStatus(200); });
 
