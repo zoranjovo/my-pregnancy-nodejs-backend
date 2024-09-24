@@ -30,6 +30,7 @@ module.exports = async (mclient, req, res, JWTsecret) => {
           const doctor = await usersCollection.findOne({ _id: new ObjectId(request.doctorId) });
           if (doctor) {
             request.doctorName = `${doctor.firstname} ${doctor.lastname}`;
+            request.meetingURL = doctor.meetingURL || null;
           }
           return request;
         })
@@ -48,6 +49,7 @@ module.exports = async (mclient, req, res, JWTsecret) => {
           if (pregnantUser) {
             request.userName = `${pregnantUser.firstname} ${pregnantUser.lastname}`;
           }
+          request.meetingURL = user.meetingURL || null;
           return request;
         })
       );

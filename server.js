@@ -11,6 +11,7 @@ const getAllFitnessVideos = require('./functions/fitness/getAllFitnessVideos.js'
 const getAllDoctors = require('./functions/consultation/getAllDoctors.js');
 const newConsultationRequest = require('./functions/consultation/newConsultationRequest.js');
 const getExistingConsultationRequests = require('./functions/consultation/getExistingConsultationRequests.js');
+const updateConsultationState = require('./functions/consultation/updateConsultationState.js');
 
 //mongo
 const {MongoClient} = require('mongodb');
@@ -63,3 +64,4 @@ app.get('//fitness/allvideos', async (req,res) => { getAllFitnessVideos(mclient,
 app.get('//consultation/alldoctors', async (req,res) => { getAllDoctors(mclient, req, res); });
 app.post('//consultation/newrequest', async (req,res) => { newConsultationRequest(mclient, req, res, config.JWTsecret); });
 app.get('//consultation/getexisting', async (req,res) => { getExistingConsultationRequests(mclient, req, res, config.JWTsecret); });
+app.post('//consultation/updatestate', async (req,res) => { updateConsultationState(mclient, req, res, config.JWTsecret); });

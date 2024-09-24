@@ -26,7 +26,7 @@ module.exports = async (mclient, req, res, JWTsecret) => {
     // Get updated user data from request body
     const {
       firstname, lastname, phone, dob, address,
-      aphraVerification, specialization, yearsExperience, gender,
+      gender, aphraVerification, specialization, yearsExperience, meetingURL,
       weight, pregnancyMonth, conceptionDate, bloodType, allergens
     } = JSON.parse(req.body.data);
 
@@ -53,10 +53,12 @@ module.exports = async (mclient, req, res, JWTsecret) => {
       // Doctors can update professional-related fields
       updatedFields = {
         ...updatedFields,
+        ...(gender !== undefined && { gender }),
         ...(aphraVerification !== undefined && { aphraVerification }),
         ...(specialization !== undefined && { specialization }),
         ...(yearsExperience !== undefined && { yearsExperience }),
-        ...(gender !== undefined && { gender }),
+        ...(meetingURL !== undefined && { meetingURL }),
+        
       };
     } else {
       // If the role is not recognized, return an error
