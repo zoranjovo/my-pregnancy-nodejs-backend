@@ -1,3 +1,5 @@
+// CHECK THAT THE CONFIG.JS IS THE SAME AS WHAT IT IS ON DISCORD IF YOU GET ERRORS
+
 const fs = require('fs');
 const config = JSON.parse(fs.readFileSync('config.json'));
 
@@ -5,6 +7,7 @@ const register = require('./functions/register.js');
 const login = require('./functions/login.js'); 
 const getUser = require('./functions/getUser.js');
 const updateUser = require('./functions/updateUser.js');
+const updateUserPhoto = require('./functions/updateUserPhoto.js');
 const newJournalEntry = require('./functions/journal/newJournalEntry.js');
 const getAllJournalEntries = require('./functions/journal/getAllEntries.js');
 const getAllFitnessVideos = require('./functions/fitness/getAllFitnessVideos.js');
@@ -54,12 +57,23 @@ app.use((err, req, res, next) => {
 app.use(cors())
 app.listen(PORT, () => { console.log(`express server active, http://localhost:${PORT}`); });
 
+const Minio = require('minio');
+const minioClient = new Minio.Client({
+  endPoint: config.minioURL,
+  port: 9000,
+  useSSL: false,
+  accessKey: config.minioUsr,
+  secretKey: config.minioPwd
+});
+
+
 app.get('//test', async (req, res) => { res.sendStatus(200); });
 
 app.post('//register', async (req,res) => { register(mclient, req, res, config.JWTsecret); });
 app.post('//login', async (req,res) => { login(mclient, req, res, config.JWTsecret); });
-app.get('//getuser', async (req,res) => { getUser(mclient, req, res, config.JWTsecret); });
+app.get('//getuser', async (req,res) => { getUser(mclient, req, res, config.JWTsecret, minioClient); });
 app.post('//updateUser', async (req,res) => { updateUser(mclient, req, res, config.JWTsecret); });
+app.post('//updateUserPhoto', async (req,res) => { updateUserPhoto(mclient, req, res, config.JWTsecret, minioClient); });
 app.post('//journal/newentry', async (req,res) => { newJournalEntry(mclient, req, res, config.JWTsecret); });
 app.get('//journal/allentries', async (req,res) => { getAllJournalEntries(mclient, req, res, config.JWTsecret); });
 app.get('//fitness/allvideos', async (req,res) => { getAllFitnessVideos(mclient, req, res); });

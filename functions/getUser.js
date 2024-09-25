@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-module.exports = async (mclient, req, res, JWTsecret) => {
+module.exports = async (mclient, req, res, JWTsecret, minioClient) => {
   try {
     // Extract the token from the Authorization header
     const token = req.headers.authorization?.split(' ')[1];
@@ -14,12 +14,31 @@ module.exports = async (mclient, req, res, JWTsecret) => {
     const collection = db.collection("users");
 
     // Fetch the user from the database excluding _id and password
-    const user = await collection.findOne({ email: decoded.email }, { projection: { _id: 0, password: 0 } });
+    const user = await collection.findOne({ email: decoded.email }, { projection: { password: 0 } });
 
-    if (!user) {return res.status(404).send({ error: "User not found" }); }
+    if(!user){return res.status(404).send({ error: "User not found" }); }
+
+    const bucketName = 'my-pregnancy-user-photos';
+    const objectName = user._id.toString();
+    let profilePhotoUrl = null;
+
+    // Check if the object exists in MinIO and generate a URL
+    try {
+      // You can either provide a pre-signed URL (valid for a limited time) or direct public URL
+      profilePhotoUrl = await minioClient.presignedGetObject(bucketName, objectName);
+    } catch (minioErr) {
+      console.log('Error retrieving MinIO object:', minioErr);
+      // If the object doesn't exist or there's an error, fallback or return null for profilePhotoUrl
+      profilePhotoUrl = null; 
+    }
+
+    const userData = {
+      ...user,
+      profilePhotoUrl // Include the profile photo URL in the response
+    };
 
     // Return the user data
-    res.json(user);
+    res.json(userData);
   } catch (err) {
     console.log(err);
     if (err.name === "JsonWebTokenError") {
