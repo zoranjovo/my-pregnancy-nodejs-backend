@@ -1,11 +1,18 @@
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
 
-
 const multerUpload = multer({
-  storage: multer.memoryStorage(), // Store the file in memory (buffer) for easy upload to MinIO
+  storage: multer.memoryStorage(), // Store the file in memory (buffer)
   limits: { fileSize: 5 * 1024 * 1024 }, // Set file size limit (e.g., 5MB)
-}).single('profilePhoto'); // The name of the form field for the file
+  fileFilter: (req, file, cb) => {
+    // Allow only png and jpg mimetypes
+    if (file.mimetype === 'image/png' || file.mimetype === 'image/jpeg') {
+      cb(null, true); // Accept the file
+    } else {
+      cb(new Error('Only .png and .jpg formats are allowed!'), false); // Reject the file
+    }
+  },
+}).single('profilePhoto'); // Name of the form field for the file
 
 
 module.exports = async (mclient, req, res, JWTsecret, minioClient) => {
@@ -17,7 +24,7 @@ module.exports = async (mclient, req, res, JWTsecret, minioClient) => {
     // Verify the token
     const decoded = jwt.verify(token, JWTsecret);
     if (!decoded) { return res.status(401).send({ error: "Token invalid" }); }
-
+    
     const db = mclient.db("my-pregnancy-dev");
     const collection = db.collection("users");
 
@@ -27,15 +34,8 @@ module.exports = async (mclient, req, res, JWTsecret, minioClient) => {
 
 
     multerUpload(req, res, async function (err) {
-      if (err) {
-        console.log(err)
-        return res.status(400).send({ error: "File upload failed", details: err.message });
-      }
-
-      // Check if a file was uploaded
-      if (!req.file) {
-        return res.status(400).send({ error: "No file provided" });
-      }
+      if (err) { return res.status(400).send({ error: "File upload failed", details: err.message }); }
+      if (!req.file) { return res.status(400).send({ error: "No file provided" }); }
 
       // Extract the uploaded file's buffer and original name
       const fileBuffer = req.file.buffer;
@@ -56,6 +56,11 @@ module.exports = async (mclient, req, res, JWTsecret, minioClient) => {
         await minioClient.putObject(bucketName, objectName, fileBuffer, fileBuffer.length, {
           'Content-Type': req.file.mimetype
         });
+
+        await collection.updateOne(
+          { email: user.email },
+          { $set: { pfpExists: true } }
+        );
 
         return res.sendStatus(200);
       } catch (minioErr) {

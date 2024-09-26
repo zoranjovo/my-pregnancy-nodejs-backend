@@ -28,6 +28,7 @@ module.exports = async (mclient, req, res, JWTsecret) => {
         lastname: lastname,
         email: email,
         password: hashedPassword,
+        pfpExists: false,
       }
 
       const result = await collection.insertOne(doc);

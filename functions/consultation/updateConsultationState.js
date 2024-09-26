@@ -11,7 +11,14 @@ module.exports = async (mclient, req, res, JWTsecret) => {
     const decoded = jwt.verify(token, JWTsecret);
     if(!decoded){return res.status(401).send({ error: "Token invalid" }); }
 
+    
+
+    // Fetch the user from the database
     const db = mclient.db("my-pregnancy-dev");
+    const users = db.collection("users");
+    const user = await users.findOne({ email: decoded.email });
+    if(!user){ return res.status(404).send({ error: "User not found" }); }
+
     const consultationRequestsCollection = db.collection("consultation-requests");
 
     const { consultationid, newstatus } = req.body;
@@ -21,7 +28,7 @@ module.exports = async (mclient, req, res, JWTsecret) => {
     if(!consultation){ return res.status(404).send({ error: "Consultation not found" }); }
 
     // validate new state is valid
-    const validStatus= ["accepted", "rejected", "completed", "cancelled"];
+    const validStatus= ["accepted", "rejected", "completed", "cancelled", "clear"];
     if(!validStatus.includes(newstatus)){ return res.status(400).send({ error: "Invalid state value" }); }
     if(consultation.status === "pending"){
       if(newstatus === "completed"){ return res.status(400).send({ error: "Invalid state value" }); }
@@ -29,8 +36,18 @@ module.exports = async (mclient, req, res, JWTsecret) => {
     if(consultation.status === "accepted"){
       if(newstatus === "rejected"){ return res.status(400).send({ error: "Invalid state value" }); }
     }
-    if(consultation.status === "rejected"){ return res.status(400).send({ error: "Invalid state value" }); }
-    if(consultation.status === "cancelled"){ return res.status(400).send({ error: "Invalid state value" }); }
+
+    if(newstatus === "clear"){
+      if(user.role === "pregnant"){
+        await consultationRequestsCollection.updateOne({ _id: new ObjectId(consultationid) }, { $set: { pregnantCleared: true } });
+        return res.status(200).send({ message: `Successfully cleared consultation` });
+      }
+      if(user.role === "doctor"){
+        await consultationRequestsCollection.updateOne({ _id: new ObjectId(consultationid) }, { $set: { doctorCleared: true } });
+        return res.status(200).send({ message: `Successfully cleared consultation` });
+      }
+      return;
+    }
 
     // update consultation request with new state
     const result = await consultationRequestsCollection.updateOne({ _id: new ObjectId(consultationid) }, { $set: { status: newstatus } });
