@@ -22,6 +22,7 @@ const updateConsultationState = require('./functions/consultation/updateConsulta
 
 const getForumsHome = require('./functions/forums/getForumsHome.js');
 const getAllForumsInCategory = require('./functions/forums/getAllForumsInCategory.js');
+const getPost = require('./functions/forums/getPost.js');
 
 const PORT = 8000;
 
@@ -95,3 +96,4 @@ app.post('//consultation/updatestate', async (req,res) => { updateConsultationSt
 
 app.get('//forums/gethome', async (req,res) => { getForumsHome(mclient, res, minioClient); });
 app.get('//forums/getcategory', async (req,res) => { getAllForumsInCategory(mclient, req, res, minioClient); });
+app.get('//forums/getpost', async (req,res) => { getPost(mclient, req, res, minioClient); });
