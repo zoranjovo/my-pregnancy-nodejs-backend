@@ -9,13 +9,19 @@ const getUser = require('./functions/getUser.js');
 const updateUser = require('./functions/updateUser.js');
 const updateUserPhoto = require('./functions/updateUserPhoto.js');
 const deleteUserPhoto = require('./functions/deleteUserPhoto.js');
+
 const newJournalEntry = require('./functions/journal/newJournalEntry.js');
 const getAllJournalEntries = require('./functions/journal/getAllEntries.js');
+
 const getAllFitnessVideos = require('./functions/fitness/getAllFitnessVideos.js');
+
 const getAllDoctors = require('./functions/consultation/getAllDoctors.js');
 const newConsultationRequest = require('./functions/consultation/newConsultationRequest.js');
 const getExistingConsultationRequests = require('./functions/consultation/getExistingConsultationRequests.js');
 const updateConsultationState = require('./functions/consultation/updateConsultationState.js');
+
+const getForumsHome = require('./functions/forums/getForumsHome.js');
+const getAllForumsInCategory = require('./functions/forums/getAllForumsInCategory.js');
 
 const PORT = 8000;
 
@@ -76,10 +82,16 @@ app.get('//getuser', async (req,res) => { getUser(mclient, req, res, config.JWTs
 app.post('//updateuser', async (req,res) => { updateUser(mclient, req, res, config.JWTsecret); });
 app.post('//updateuserphoto', async (req,res) => { updateUserPhoto(mclient, req, res, config.JWTsecret, minioClient); });
 app.post('//deleteuserphoto', async (req,res) => { deleteUserPhoto(mclient, req, res, config.JWTsecret); });
+
 app.post('//journal/newentry', async (req,res) => { newJournalEntry(mclient, req, res, config.JWTsecret); });
 app.get('//journal/allentries', async (req,res) => { getAllJournalEntries(mclient, req, res, config.JWTsecret); });
+
 app.get('//fitness/allvideos', async (req,res) => { getAllFitnessVideos(mclient, req, res); });
+
 app.get('//consultation/alldoctors', async (req,res) => { getAllDoctors(mclient, req, res, minioClient); });
 app.post('//consultation/newrequest', async (req,res) => { newConsultationRequest(mclient, req, res, config.JWTsecret); });
 app.get('//consultation/getexisting', async (req,res) => { getExistingConsultationRequests(mclient, req, res, config.JWTsecret); });
 app.post('//consultation/updatestate', async (req,res) => { updateConsultationState(mclient, req, res, config.JWTsecret); });
+
+app.get('//forums/gethome', async (req,res) => { getForumsHome(mclient, res, minioClient); });
+app.get('//forums/getcategory', async (req,res) => { getAllForumsInCategory(mclient, req, res, minioClient); });

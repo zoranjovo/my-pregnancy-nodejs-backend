@@ -17,23 +17,7 @@ module.exports = async (mclient, req, res, JWTsecret, minioClient) => {
     const user = await collection.findOne({ email: decoded.email }, { projection: { password: 0 } });
     if(!user){return res.status(404).send({ error: "User not found" }); }
 
-    const bucketName = 'my-pregnancy-user-photos';
-    const objectName = user._id.toString();
-    let profilePhotoUrl = null;
-
-    if(user.pfpExists){
-      try {
-        // generate url
-        profilePhotoUrl = await minioClient.presignedGetObject(bucketName, objectName);
-      } catch (minioErr) {
-        console.log('Error retrieving MinIO object:', minioErr);
-        profilePhotoUrl = null; 
-      }
-    }
-
-    // Return the user data
-    const userData = { ...user, profilePhotoUrl };
-    res.json(userData);
+    res.json({ ...user, imagesURL: `${minioClient.protocol}//${minioClient.host}:${minioClient.port}/my-pregnancy-user-photos/` });
     
   } catch (err) {
     console.log(err);
