@@ -30,7 +30,7 @@ module.exports = async (mclient, req, res, JWTsecret) => {
     if(!replyText || replyText.trim() === ""){ return res.status(400).json({ error: "Reply text cannot be empty" }); }
 
     // Check if the post exists
-    const post = await forumsCollection.findOne({ _id: postId });
+    const post = await forumsCollection.findOne({ _id: new ObjectId(postId) });
     if(!post){ return res.status(404).json({ error: "Post not found" }); }
 
     // Create a new reply
@@ -46,7 +46,7 @@ module.exports = async (mclient, req, res, JWTsecret) => {
 
     // Update the reply count in the original post
     await forumsCollection.updateOne(
-      { _id: postId },
+      { _id: new ObjectId(postId) },
       { $inc: { replies: 1 } } // Increment the reply count
     );
 

@@ -9,7 +9,10 @@ module.exports = async (mclient, req, res, minioClient) => {
     // Get the category from the request body
     const { category } = req.query;
 
-    if (!category) { return res.status(400).json({ error: "Category is required" }); }
+    if(!category){ return res.status(400).json({ error: "Category is required" }); }
+
+    const validCategories = ['general', 'info', 'support'];
+    if(!validCategories.includes(category)){ return res.status(400).json({ error: "Category is invalid" }); }
 
     // Find all posts in the specified category, sorted by date in descending order
     const posts = await forumsCollection.find(

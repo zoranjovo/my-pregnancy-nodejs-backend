@@ -10,12 +10,12 @@ module.exports = async (mclient, req, res, minioClient) => {
     // Get the post ID from the request query
     const { postId } = req.query;
 
-    if (!postId) { return res.status(400).json({ error: "Post ID is required" }); }
+    if(!postId){ return res.status(400).json({ error: "Post ID is required" }); }
 
     let post;
     try {
       // Find the post by its _id
-      post = await forumsCollection.findOne({ _id: postId });
+      post = await forumsCollection.findOne({ _id: new ObjectId(postId) });
       if(!post){ return res.status(404).json({ error: "Post not found" }); }
     } catch (err) {
       return res.status(400).json({ error: "Invalid Post ID format" });

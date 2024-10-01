@@ -24,6 +24,7 @@ const getForumsHome = require('./functions/forums/getForumsHome.js');
 const getAllForumsInCategory = require('./functions/forums/getAllForumsInCategory.js');
 const getPost = require('./functions/forums/getPost.js');
 const addReply = require('./functions/forums/addReply.js');
+const createPost = require('./functions/forums/createPost.js');
 
 const PORT = 8000;
 
@@ -99,3 +100,4 @@ app.get('//forums/gethome', async (req,res) => { getForumsHome(mclient, res, min
 app.get('//forums/getcategory', async (req,res) => { getAllForumsInCategory(mclient, req, res, minioClient); });
 app.get('//forums/getpost', async (req,res) => { getPost(mclient, req, res, minioClient); });
 app.post('//forums/reply', async (req,res) => { addReply(mclient, req, res, config.JWTsecret); });
+app.post('//forums/create', async (req,res) => { createPost(mclient, req, res, config.JWTsecret); });
