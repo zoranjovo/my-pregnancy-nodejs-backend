@@ -1,14 +1,5 @@
-config.json:
-
-```
-{
-    "mongoURL": "...",
-    "JWTsecret": "..."
-}
-```
+### config.json is in the discord in #uploads
 ### set JWTsecret to "123" to work with the existing test DB
-
-### mongoURL is in the discord in #uploads
 
 # To run it
 1. Make the condig.json in the root directory as shown above
