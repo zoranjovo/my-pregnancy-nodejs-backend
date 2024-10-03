@@ -3,13 +3,13 @@ const multer = require('multer');
 
 const multerUpload = multer({
   storage: multer.memoryStorage(), // Store the file in memory (buffer)
-  limits: { fileSize: 5 * 1024 * 1024 }, // Set file size limit (e.g., 5MB)
+  limits: { fileSize: 10 * 1024 * 1024 }, // Set file size limit (e.g., 5MB)
   fileFilter: (req, file, cb) => {
     // Allow only png and jpg mimetypes
     if (file.mimetype === 'image/png' || file.mimetype === 'image/jpeg') {
       cb(null, true); // Accept the file
     } else {
-      cb(new Error('Only .png and .jpg formats are allowed!'), false); // Reject the file
+      cb(new Error('Only .png and .jpg formats under 10mb are allowed!'), false); // Reject the file
     }
   },
 }).single('profilePhoto'); // Name of the form field for the file
