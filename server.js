@@ -26,6 +26,11 @@ const getPost = require('./functions/forums/getPost.js');
 const addReply = require('./functions/forums/addReply.js');
 const createPost = require('./functions/forums/createPost.js');
 
+const getNotifications = require('./functions/notification/getNotifications.js');
+const clearNotification = require('./functions/notification/clearNotification.js');
+const clearAllNotifications = require('./functions/notification/clearAllNotifications.js');
+
+
 const PORT = 8000;
 
 //mongo
@@ -101,3 +106,7 @@ app.get('//forums/getcategory', async (req,res) => { getAllForumsInCategory(mcli
 app.get('//forums/getpost', async (req,res) => { getPost(mclient, req, res, minioClient); });
 app.post('//forums/reply', async (req,res) => { addReply(mclient, req, res, config.JWTsecret); });
 app.post('//forums/create', async (req,res) => { createPost(mclient, req, res, config.JWTsecret); });
+
+app.get('//notifications/get', async (req,res) => { getNotifications(mclient, req, res, config.JWTsecret); });
+app.post('//notifications/clear', async (req,res) => { clearNotification(mclient, req, res, config.JWTsecret); });
+app.post('//notifications/clearall', async (req,res) => { clearAllNotifications(mclient, req, res, config.JWTsecret); });

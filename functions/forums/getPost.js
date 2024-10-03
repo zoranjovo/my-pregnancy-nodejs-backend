@@ -73,6 +73,12 @@ module.exports = async (mclient, req, res, minioClient) => {
       return reply;
     }));
 
+    // increment view count
+    await forumsCollection.updateOne(
+      { _id: new ObjectId(postId) },
+      { $inc: { views: 1 } } // Increment the views count
+    );
+
     // Send the response with the enriched post and replies
     res.json({
       post,
