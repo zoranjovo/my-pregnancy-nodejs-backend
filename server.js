@@ -30,6 +30,9 @@ const getNotifications = require('./functions/notification/getNotifications.js')
 const clearNotification = require('./functions/notification/clearNotification.js');
 const clearAllNotifications = require('./functions/notification/clearAllNotifications.js');
 
+const getAllChecklists = require('./functions/checklist/getAllChecklists.js');
+const createChecklist = require('./functions/checklist/newChecklist.js');
+const updateChecklist = require('./functions/checklist/updateChecklist.js');
 
 const PORT = 8000;
 
@@ -81,7 +84,6 @@ const minioClient = new Minio.Client({
   secretKey: config.minioPwd
 });
 
-
 app.get('//test', async (req, res) => { res.sendStatus(200); });
 
 app.post('//register', async (req,res) => { register(mclient, req, res, config.JWTsecret); });
@@ -110,3 +112,7 @@ app.post('//forums/create', async (req,res) => { createPost(mclient, req, res, c
 app.get('//notifications/get', async (req,res) => { getNotifications(mclient, req, res, config.JWTsecret); });
 app.post('//notifications/clear', async (req,res) => { clearNotification(mclient, req, res, config.JWTsecret); });
 app.post('//notifications/clearall', async (req,res) => { clearAllNotifications(mclient, req, res, config.JWTsecret); });
+
+app.get('//checklist/all', async (req, res) => { getAllChecklists(mclient, res); });
+app.post('/checklist/create', (req, res) => createChecklist(mclient, req, res, config.JWTsecret));
+app.post('/checklist/update/:id', (req, res) => { updateChecklist(mclient, req, res, config.JWTsecret); });
