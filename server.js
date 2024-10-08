@@ -32,7 +32,7 @@ const clearAllNotifications = require('./functions/notification/clearAllNotifica
 
 const getAllChecklists = require('./functions/checklist/getAllChecklists.js');
 const createChecklist = require('./functions/checklist/newChecklist.js');
-const updateChecklist = require('./functions/checklist/updateChecklist.js');
+const deleteChecklist = require('./functions/checklist/deleteChecklist.js');
 
 const PORT = 8000;
 
@@ -115,4 +115,4 @@ app.post('//notifications/clearall', async (req,res) => { clearAllNotifications(
 
 app.get('//checklist/all', async (req, res) => { getAllChecklists(mclient, res); });
 app.post('/checklist/create', (req, res) => createChecklist(mclient, req, res, config.JWTsecret));
-app.post('/checklist/update/:id', (req, res) => { updateChecklist(mclient, req, res, config.JWTsecret); });
+app.post('/checklist/delete/:id', (req, res) => { deleteChecklist(mclient, req, res, config.JWTsecret); });
