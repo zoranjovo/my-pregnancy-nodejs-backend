@@ -14,6 +14,9 @@ const newJournalEntry = require('./functions/journal/newJournalEntry.js');
 const getAllJournalEntries = require('./functions/journal/getAllEntries.js');
 
 const getAllFitnessVideos = require('./functions/fitness/getAllFitnessVideos.js');
+const getUserPostedVideos = require('./functions/fitness/getUserPostedVideos.js');
+const postUserVideo = require('./functions/fitness/postUserVideo.js');
+const deleteUserVideo = require('./functions/fitness/deleteUserVideo.js');
 
 const getAllDoctors = require('./functions/consultation/getAllDoctors.js');
 const newConsultationRequest = require('./functions/consultation/newConsultationRequest.js');
@@ -99,6 +102,9 @@ app.post('//journal/newentry', async (req,res) => { newJournalEntry(mclient, req
 app.get('//journal/allentries', async (req,res) => { getAllJournalEntries(mclient, req, res, config.JWTsecret); });
 
 app.get('//fitness/allvideos', async (req,res) => { getAllFitnessVideos(mclient, req, res); });
+app.get('//fitness/uservideos', async (req, res) => { getUserPostedVideos(mclient, req, res, config.JWTsecret); });
+app.post('//fitness/postvideo', async (req, res) => { postUserVideo(mclient, req, res, config.JWTsecret); });
+app.post('//fitness/deletevideo', async (req, res) => { deleteUserVideo(mclient, req, res, config.JWTsecret); });
 
 app.get('//consultation/alldoctors', async (req,res) => { getAllDoctors(mclient, req, res, minioClient); });
 app.post('//consultation/newrequest', async (req,res) => { newConsultationRequest(mclient, req, res, config.JWTsecret); });
@@ -118,5 +124,6 @@ app.post('//notifications/clearall', async (req,res) => { clearAllNotifications(
 app.get('//checklist/all', async (req, res) => { getAllChecklists(mclient, res); });
 app.post('/checklist/create', (req, res) => createChecklist(mclient, req, res, config.JWTsecret));
 app.post('/checklist/update/:id', (req, res) => { updateChecklist(mclient, req, res, config.JWTsecret); });
+app.post('/checklist/delete/:id', (req, res) => { deleteChecklist(mclient, req, res, config.JWTsecret); });
 
 app.get('//resources', async (req,res) => { getAllResources(mclient, req, res); });
