@@ -1,27 +1,34 @@
-const resources = [
-  {
-    title: "Example",
-    desc: "blah blah blah... 1st trimester",
-    link: "example",
-    bgIMG: "/assets/e51564f6e1c60c926aff35d378d5aa12.jpg",
-    authorName: "Dr. Vera",
-    doctorIMG: "/assets/2154d24d02286926b6e1b308e5640639.png",
-    stageOfPregnancy: "1st Trimester",
-  },
-  {
-    title: "Example",
-    desc: "blah blah blah... 2nd trimester",
-    link: "example",
-    bgIMG: "/assets/e51564f6e1c60c926aff35d378d5aa12.jpg",
-    authorName: "Dr. Vera",
-    doctorIMG: "/assets/2154d24d02286926b6e1b308e5640639.png",
-    stageOfPregnancy: "2nd Trimester",
-  },
-];
+const { ObjectId } = require('mongodb');
 
-module.exports = async (mclient, req, res) => {
+module.exports = async (mclient, req, res, minioClient) => {
   try {
-    res.json(resources);
+    const db = mclient.db("my-pregnancy-dev");
+    const resourcesCollection = db.collection('resources');
+    const usersCollection = db.collection('users');
+
+    // Fetch all resources from the collection
+    const resources = await resourcesCollection.find().toArray();
+
+    // For each resource, fetch the author's name from the users collection
+    const resourcesWithAuthorNames = await Promise.all(
+      resources.map(async (resource) => {
+        const author = await usersCollection.findOne(
+          { _id: new ObjectId(resource.author)},
+        );
+
+        // If author is found, add authorName to the resource
+        if (author) {
+          resource.authorName = `Dr. ${author.firstname} ${author.lastname}`;
+          resource.pfpExists = author.pfpExists;
+        } else {
+          resource.authorName = "Unknown Author"; // Fallback if author not found
+        }
+
+        return resource;
+      })
+    );
+
+    res.json({ resources: resourcesWithAuthorNames, imagesURL: `${minioClient.protocol}//${minioClient.host}:${minioClient.port}/my-pregnancy-user-photos/` });
   } catch (err) {
     console.log(err);
     res.status(500).send({ error: "Internal Server Error" });

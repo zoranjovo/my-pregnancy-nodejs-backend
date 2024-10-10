@@ -38,6 +38,9 @@ const createChecklist = require('./functions/checklist/newChecklist.js');
 const deleteChecklist = require('./functions/checklist/deleteChecklist.js');
 
 const getAllResources = require('./functions/resources/getAllResources.js');
+const getUserPostedResources = require('./functions/resources/getUserPostedResources.js');
+const postUserResource = require('./functions/resources/postUserResource.js');
+const deleteUserResource  = require('./functions/resources/deleteUserResource.js');
 
 const PORT = 8000;
 
@@ -126,4 +129,7 @@ app.post('/checklist/create', (req, res) => createChecklist(mclient, req, res, c
 app.post('/checklist/update/:id', (req, res) => { updateChecklist(mclient, req, res, config.JWTsecret); });
 app.post('/checklist/delete/:id', (req, res) => { deleteChecklist(mclient, req, res, config.JWTsecret); });
 
-app.get('//resources', async (req,res) => { getAllResources(mclient, req, res); });
+app.get('//resources', async (req,res) => { getAllResources(mclient, req, res, minioClient); });
+app.get('//resources/userresources', async (req, res) => { getUserPostedResources(mclient, req, res, config.JWTsecret); });
+app.post('//resources/postresource', async (req, res) => { postUserResource(mclient, req, res, config.JWTsecret); });
+app.post('//resources/deleteresource', async (req, res) => { deleteUserResource(mclient, req, res, config.JWTsecret); });

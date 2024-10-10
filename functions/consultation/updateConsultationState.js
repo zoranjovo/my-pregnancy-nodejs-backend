@@ -53,10 +53,28 @@ module.exports = async (mclient, req, res, JWTsecret) => {
     const result = await consultationRequestsCollection.updateOne({ _id: new ObjectId(consultationid) }, { $set: { status: newstatus } });
 
     // check if update was successful
-    if (result.modifiedCount === 0) { return res.status(400).send({ error: "State not changed" }); }
+    if(result.modifiedCount === 0){ return res.status(400).send({ error: "State not changed" }); }
 
     // send success msg
     res.status(200).send({ message: `Successfully ${newstatus} consultation` });
+
+    if(newstatus === "accepted"){
+      const notificationsCollection = db.collection("notifications");
+
+      // Calculate the notification time as 15 minutes before the consultation date
+      const notificationTime = consultation.date - (15 * 60 * 1000); // 15 minutes in milliseconds
+
+      // Create a new notification document
+      const notification = {
+        doctorID: consultation.doctorId, // Adjust as needed
+        notificationText: `You have an upcoming consultation booking in 15 minutes`,
+        date: new Date(notificationTime).toISOString(),
+        link: "/consultation/manage"
+      };
+
+      // Insert the notification into the notifications collection
+      await notificationsCollection.insertOne(notification);
+    }
 
   } catch (err) {
     console.log(err);

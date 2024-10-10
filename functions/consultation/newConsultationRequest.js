@@ -50,7 +50,7 @@ module.exports = async (mclient, req, res, JWTsecret) => {
         doctorID: consultant,
         notificationText: `You have a new consultation booking from ${user.firstname} ${user.lastname}`,
         date: new Date().toISOString(),
-        link: `/consultations/manage`
+        link: `/consultation/manage`
       };
       await notificationsCollection.insertOne(notification);
 

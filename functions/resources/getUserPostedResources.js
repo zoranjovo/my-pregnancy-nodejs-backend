@@ -11,25 +11,19 @@ module.exports = async (mclient, req, res, JWTsecret) => {
     if(!decoded){ return res.status(401).send({ error: "Token invalid" }); }
 
     const db = mclient.db("my-pregnancy-dev");
-    const collection = db.collection("fitness-videos");
+    const usersCollection = db.collection("users");
 
-    // Create the video entry schema
-    const { title, desc, url, time } = req.body;
-    const videoEntry = {
-      author: decoded.userId,
-      name: title,
-      desc: desc,
-      url: url,
-      time: time
-    };
+    // Fetch the user from the database using the email from the decoded token
+    const user = await usersCollection.findOne({ email: decoded.email }, { projection: { _id: 1 } });
+    if(!user){ return res.status(404).send({ error: "User not found" }); }
 
-    // Insert the video entry into the database
-    const result = await collection.insertOne(videoEntry);
-    if (result.acknowledged) {
-      res.status(200).send({ success: "Video added successfully" });
-    } else {
-      res.status(500).send({ error: "Failed to add video" });
-    }
+    const resourcesCollection = db.collection("resources");
+
+    // Fetch all fitness video entries for the user using the user's _id
+    const resources = await resourcesCollection.find({ author: user._id.toString() }).toArray();
+
+    // Return the videos in a JSON array
+    res.json(resources.reverse());
   } catch (err) {
     console.log(err);
     if (err.name === "JsonWebTokenError" || err.name === "TokenExpiredError") {

@@ -11,24 +11,29 @@ module.exports = async (mclient, req, res, JWTsecret) => {
     if(!decoded){ return res.status(401).send({ error: "Token invalid" }); }
 
     const db = mclient.db("my-pregnancy-dev");
-    const collection = db.collection("fitness-videos");
+    const collection = db.collection("resources");
+    const { title, desc, url, content, stage, imgurl } = req.body;
 
-    // Create the video entry schema
-    const { title, desc, url, time } = req.body;
-    const videoEntry = {
+    //check if the url is already taken if so then return an error that says url already taken
+    const existingResource = await collection.findOne({ url: url });
+    if(existingResource){ return res.status(400).json({ error: "URL already taken" }); }
+
+    const resourceEntry = {
       author: decoded.userId,
       name: title,
       desc: desc,
       url: url,
-      time: time
+      content: content,
+      stage: stage,
+      imgurl: imgurl,
     };
 
     // Insert the video entry into the database
-    const result = await collection.insertOne(videoEntry);
+    const result = await collection.insertOne(resourceEntry);
     if (result.acknowledged) {
-      res.status(200).send({ success: "Video added successfully" });
+      res.status(200).send({ success: "Resource added successfully" });
     } else {
-      res.status(500).send({ error: "Failed to add video" });
+      res.status(500).send({ error: "Failed to add resource" });
     }
   } catch (err) {
     console.log(err);
